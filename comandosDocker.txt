@@ -1,0 +1,29 @@
+docker run -i -t \
+-v /tmp/.X11-unix:/tmp/.X11-unix \
+-v /u01:/u01 \
+-v /unam-bdd:/unam-bdd \
+--name c-oracle-knn \
+--hostname d-oracle-knn.fi.unam \
+--expose 1521 \
+-e DISPLAY=$DISPLAY oraclelinux:8.7 bash
+
+groupadd -g 1000 karla
+useradd -u 1000 -g karla -m -d /home/karla -s /bin/bash karla
+
+usermod -aG wheel karla
+
+sudo docker commit c-oracle-knn oracle-knn:1.0
+
+docker run -i -t \
+-v /tmp/.X11-unix:/tmp/.X11-unix \
+-v /u01:/u01 \
+-v /unam-bdd:/unam-bdd \
+--name c-oracle-knn-2 \
+--hostname do-oracle-knn.fi.unam \
+--expose 1521 \
+-e LANG=en_US.UTF-8 \
+-e LC_ALL=en_US.UTF-8 \
+-e LANGUAGE=en_US \
+-e DISPLAY=$DISPLAY oracle-knn:1.0 bash
+
+docker ps -a --no-trunc --format "{{.Names}}\t{{.Mounts}}" | grep c-oracle-knn
